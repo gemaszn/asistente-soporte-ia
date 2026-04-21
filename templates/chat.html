@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente Virtual de Soporte Técnico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fb;
+            margin: 0;
+            padding: 0;
+        }
+
+        .contenedor {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .cabecera {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+        }
+
+        .cabecera h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .cabecera p {
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .chat {
+            padding: 20px;
+        }
+
+        .mensaje {
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            line-height: 1.5;
+        }
+
+        .usuario {
+            background: #dbeafe;
+            text-align: right;
+        }
+
+        .bot {
+            background: #f3f4f6;
+        }
+
+        .formulario {
+            display: flex;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            background: #fafafa;
+        }
+
+        .formulario input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .formulario button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .formulario button:hover {
+            background: #1d4ed8;
+        }
+
+        .categoria {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        ul {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+
+        .confianza {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #475569;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="contenedor">
+        <div class="cabecera">
+            <h1>Asistente Virtual de Soporte Técnico</h1>
+            <p>Escribe tu incidencia y recibirás un diagnóstico básico con recomendaciones.</p>
+        </div>
+
+        <div class="chat" id="chat">
+            <div class="mensaje bot">
+                Hola, soy tu asistente virtual. Puedes preguntarme por problemas de internet, contraseñas, impresora o
+                rendimiento del equipo.
+            </div>
+        </div>
+
+        <div class="formulario">
+            <input type="text" id="mensaje" placeholder="Escribe aquí tu problema técnico">
+            <button onclick="enviarConsulta()">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        async function enviarConsulta() {
+            const input = document.getElementById("mensaje");
+            const chat = document.getElementById("chat");
+            const texto = input.value.trim();
+
+            if (!texto) {
+                return;
+            }
+
+            const mensajeUsuario = document.createElement("div");
+            mensajeUsuario.className = "mensaje usuario";
+            mensajeUsuario.textContent = texto;
+            chat.appendChild(mensajeUsuario);
+
+            input.value = "";
+
+            try {
+                const respuesta = await fetch("/diagnosticar", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ mensaje: texto })
+                });
+
+                const datos = await respuesta.json();
+
+                const mensajeBot = document.createElement("div");
+                mensajeBot.className = "mensaje bot";
+
+                let html = `
+                    <div class="categoria">Categoría detectada: ${datos.categoria}</div>
+                    <div>${datos.respuesta}</div>
+                    <ul>
+                        ${datos.pasos.map(paso => `<li>${paso}</li>`).join("")}
+                    </ul>
+                    <div class="confianza">Confianza del modelo: ${datos.confianza}</div>
+                `;
+
+                mensajeBot.innerHTML = html;
+                chat.appendChild(mensajeBot);
+                chat.scrollTop = chat.scrollHeight;
+
+            } catch (error) {
+                const mensajeError = document.createElement("div");
+                mensajeError.className = "mensaje bot";
+                mensajeError.textContent = "Ha ocurrido un error al consultar la API.";
+                chat.appendChild(mensajeError);
+            }
+        }
+    </script>
+</body>
+
+</html>
