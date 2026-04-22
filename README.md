@@ -50,6 +50,7 @@ git clone https://github.com/tu-usuario/asistente_soporte_ia.git
 cd asistente_soporte_ia
 ```
 Crear y activar el entorno virtual:
+
 Windows
 ```text
 python -m venv venv
@@ -74,11 +75,11 @@ uvicorn app.main:app --reload
 Acceso a la aplicación
 Documentación automática de la API:
 ```text
-http://127.0.0.1:8000/docs
+http://localhost:8000/docs
 ```
 Interfaz web del chatbot:
 ```text
-http://127.0.0.1:8000/chat
+http://localhost:8000/chat
 ```
 
 ## Ejemplos de consultas
