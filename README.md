@@ -54,6 +54,7 @@ Windows
 ```text
 python -m venv venv
 venv\Scripts\activate
+```
 Linux / macOS
 ```text
 python3 -m venv venv
